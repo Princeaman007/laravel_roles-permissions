@@ -13,27 +13,50 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        Role::create(['name' => 'Super Admin']);
-        $admin = Role::create(['name' => 'Admin']);
-        $productManager = Role::create(['name' => 'Product Manager']);
-        $user = Role::create(['name' => 'User']);
+        // Utilisation de firstOrCreate pour éviter les erreurs de duplication
+        $superAdmin = Role::firstOrCreate(['name' => 'Super Admin']);
+        $admin = Role::firstOrCreate(['name' => 'Admin']);
+        $productManager = Role::firstOrCreate(['name' => 'Product Manager']);
+        $user = Role::firstOrCreate(['name' => 'User']);
 
-        $admin->givePermissionTo([
+        // Permissions pour Admin
+        $admin->syncPermissions([
+            // Permissions existantes
             'create-user',
             'edit-user',
             'delete-user',
             'create-product',
             'edit-product',
-            'delete-product'
+            'delete-product',
+            
+            // Nouvelles permissions e-commerce
+            'view-category', 
+            'create-category', 
+            'edit-category', 
+            'delete-category',
+            'view-order', 
+            'process-order', 
+            'cancel-order',
+            'view-customer', 
+            'edit-customer',
+            'access-reports'
         ]);
 
-        $productManager->givePermissionTo([
+        // Permissions pour Product Manager
+        $productManager->syncPermissions([
+            // Permissions existantes
             'create-product',
             'edit-product',
-            'delete-product'
+            'delete-product',
+            
+            // Nouvelles permissions liées aux produits
+            'view-category', 
+            'create-category', 
+            'edit-category'
         ]);
 
-        $user->givePermissionTo([
+        // Permissions pour User standard
+        $user->syncPermissions([
             'view-product'
         ]);
     }

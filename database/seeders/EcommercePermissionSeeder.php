@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Spatie\Permission\Models\Permission;
 
-class PermissionSeeder extends Seeder
+class EcommercePermissionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,12 +14,7 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         $permissions = [
-            // Permissions existantes
-            'create-role', 'edit-role', 'delete-role',
-            'create-user', 'edit-user', 'delete-user',
-            'view-product', 'create-product', 'edit-product', 'delete-product',
-            
-            // Nouvelles permissions e-commerce
+            // Nouvelles permissions e-commerce uniquement
             'view-category', 'create-category', 'edit-category', 'delete-category',
             'view-order', 'process-order', 'cancel-order',
             'view-customer', 'edit-customer',
