@@ -40,11 +40,13 @@ class CustomerController extends Controller
      */
     public function orders()
     {
-        $orders = Order::where('user_id', Auth::id())
-                     ->orderBy('created_at', 'desc')
-                     ->paginate(10);
-                     
-        return view('account.orders', compact('orders'));
+        $user = Auth::user();
+        
+        $orders = Order::where('user_id', $user->id)
+                      ->orderBy('created_at', 'desc')
+                      ->paginate(10);
+        
+        return view('account.orders.index', compact('orders'));
     }
     
     /**

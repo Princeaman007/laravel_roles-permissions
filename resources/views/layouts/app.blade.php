@@ -13,6 +13,7 @@
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
@@ -55,12 +56,12 @@
 
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ms-auto">
-                        <!-- Panier -->
+                      <!-- Panier -->
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('cart.index') }}">
                                 <i class="bi bi-cart"></i> Panier
                                 <span class="badge bg-danger">
-                                    {{ optional(optional(Auth::user())->cart)->items->sum('quantity') ?? session('cart_items_count', 0) }}
+                                    {{ collect(optional(optional(Auth::user())->cart)->items ?? [])->sum('quantity') ?? session('cart_items_count', 0) }}
                                 </span>
                             </a>
                         </li>

@@ -7,6 +7,7 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -44,11 +45,43 @@ class ProductController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(StoreProductRequest $request): RedirectResponse
-    {
-        Product::create($request->all());
-        return redirect()->route('products.index')
-                ->withSuccess('New product is added successfully.');
+{
+    // Préparer les données avec des valeurs par défaut pour les champs manquants
+    $data = $request->validated();
+    
+    // Ajouter des valeurs par défaut si nécessaire
+    if (!isset($data['short_description'])) {
+        $data['short_description'] = $data['description'] ?? '';
     }
+    
+    if (!isset($data['slug'])) {
+        $data['slug'] = \Str::slug($data['name']);
+    }
+    
+    if (!isset($data['is_active'])) {
+        $data['is_active'] = true;
+    }
+    
+    if (!isset($data['category_id'])) {
+        // Utiliser une catégorie par défaut ou null
+        $data['category_id'] = null;
+    }
+    
+    if (!isset($data['discount_price'])) {
+        $data['discount_price'] = null;
+    }
+    
+    // Traiter l'image si elle est présente
+    if ($request->hasFile('image')) {
+        $data['image'] = $request->file('image')->store('products', 'public');
+    }
+    
+    // Créer le produit
+    Product::create($data);
+    
+    return redirect()->route('products.index')
+            ->withSuccess('New product is added successfully.');
+}
 
     /**
      * Display the specified resource.
