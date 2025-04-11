@@ -7,6 +7,11 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    @php
+    use Illuminate\Support\Facades\Session;
+    @endphp
+    
+
     <title>{{ config('app.name', 'Laravel E-commerce') }}</title>
 
     <!-- Fonts -->
@@ -58,11 +63,9 @@
                     <ul class="navbar-nav ms-auto">
                       <!-- Panier -->
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('cart.index') }}">
-                                <i class="bi bi-cart"></i> Panier
-                                <span class="badge bg-danger">
-                                    {{ collect(optional(optional(Auth::user())->cart)->items ?? [])->sum('quantity') ?? session('cart_items_count', 0) }}
-                                </span>
+                            <a href="{{ route('cart.index') }}" class="nav-link">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span class="badge bg-danger rounded-pill">{{ Session::get('cart_items_count', 0) }}</span>
                             </a>
                         </li>
                         

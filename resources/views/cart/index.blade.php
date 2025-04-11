@@ -2,6 +2,7 @@
 
 @section('title', 'Panier d\'achat')
 
+
 @section('content')
 <div class="container py-5">
     <h1 class="mb-4">Votre Panier</h1>
@@ -19,71 +20,73 @@
     @endif
 
     @if($cartItems->count() > 0)
-        <form action="{{ route('cart.update') }}" method="POST">
-            @csrf
-            <div class="card mb-4 shadow-sm">
-                <div class="card-body p-0">
-                    <table class="table table-hover mb-0">
-                        <thead class="bg-light">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="border-0">Produit</th>
+                            <th class="border-0">Prix</th>
+                            <th class="border-0" style="width: 140px;">Quantité</th>
+                            <th class="border-0 text-end">Total</th>
+                            <th class="border-0"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($cartItems as $item)
                             <tr>
-                                <th class="border-0">Produit</th>
-                                <th class="border-0">Prix</th>
-                                <th class="border-0" style="width: 140px;">Quantité</th>
-                                <th class="border-0 text-end">Total</th>
-                                <th class="border-0"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($cartItems as $item)
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            @if($item->product->image)
-                                                <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}" class="img-thumbnail me-3" style="width: 60px; height: 60px; object-fit: cover;">
-                                            @else
-                                                <div class="bg-light me-3" style="width: 60px; height: 60px;"></div>
-                                            @endif
-                                            <div>
-                                                <h6 class="mb-0">{{ $item->product->name }}</h6>
-                                                <small class="text-muted">{{ Str::limit($item->product->description, 50) }}</small>
-                                            </div>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        @if($item->product->image)
+                                            <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}" class="img-thumbnail me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                        @else
+                                            <div class="bg-light me-3" style="width: 60px; height: 60px;"></div>
+                                        @endif
+                                        <div>
+                                            <h6 class="mb-0">{{ $item->product->name }}</h6>
+                                            <small class="text-muted">{{ Str::limit($item->product->description, 50) }}</small>
                                         </div>
-                                    </td>
-                                    <td>{{ number_format($item->price, 2) }} €</td>
-                                    <td>
-                                        <input type="hidden" name="items[{{ $loop->index }}][id]" value="{{ $item->id }}">
-                                        <input type="number" name="items[{{ $loop->index }}][quantity]" value="{{ $item->quantity }}" min="1" class="form-control">
-                                    </td>
-                                    <td class="text-end">{{ number_format($item->price * $item->quantity, 2) }} €</td>
-                                    <td class="text-end">
-                                        <form action="{{ route('cart.remove') }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <input type="hidden" name="item_id" value="{{ $item->id }}">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Êtes-vous sûr de vouloir retirer ce produit ?')">
-                                                <i class="fas fa-trash"></i>
+                                    </div>
+                                </td>
+                                <td>{{ number_format($item->price, 2) }} €</td>
+                                <td>
+                                    <form action="{{ route('cart.update') }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <input type="hidden" name="items[0][id]" value="{{ $item->id }}">
+                                        <div class="input-group">
+                                            <input type="number" name="items[0][quantity]" value="{{ $item->quantity }}" min="1" class="form-control">
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-sync-alt"></i>
                                             </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-                <div class="card-footer d-flex justify-content-between align-items-center">
-                    <div>
-                        <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left me-2"></i>Continuer les achats
-                        </a>
-                        <button type="submit" class="btn btn-primary ms-2">
-                            <i class="fas fa-sync-alt me-2"></i>Mettre à jour le panier
-                        </button>
-                    </div>
-                    <a href="{{ route('cart.clear') }}" class="btn btn-outline-danger" onclick="return confirm('Êtes-vous sûr de vouloir vider votre panier ?')">
-                        <i class="fas fa-trash me-2"></i>Vider le panier
+                                        </div>
+                                    </form>
+                                </td>
+                                <td class="text-end">{{ number_format($item->price * $item->quantity, 2) }} €</td>
+                                <td class="text-end">
+                                    <form action="{{ route('cart.remove') }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <input type="hidden" name="item_id" value="{{ $item->id }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Êtes-vous sûr de vouloir retirer ce produit ?')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="{{ route('shop.index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Continuer les achats
                     </a>
                 </div>
+                <a href="{{ route('cart.clear') }}" class="btn btn-outline-danger" onclick="return confirm('Êtes-vous sûr de vouloir vider votre panier ?')">
+                    <i class="fas fa-trash me-2"></i>Vider le panier
+                </a>
             </div>
-        </form>
+        </div>
 
         <!-- Résumé du panier -->
         <div class="row mt-4">
