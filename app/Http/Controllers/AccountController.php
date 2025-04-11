@@ -120,10 +120,11 @@ class AccountController extends Controller
      * Afficher la liste des adresses
      */
     public function addresses()
-    {
-        $addresses = Address::where('user_id', Auth::id())->get();
-        return view('account.addresses.index', compact('addresses'));
-    }
+{
+    $addresses = Address::where('user_id', Auth::id())->get();
+    return view('account.addresses.index', compact('addresses'));
+}
+
     
     /**
      * Afficher le formulaire de création d'une adresse
@@ -137,44 +138,50 @@ class AccountController extends Controller
      * Enregistrer une nouvelle adresse
      */
     public function storeAddress(Request $request)
-    {
-        $request->validate([
-            'full_name' => 'required|string|max:255',
-            'address_line1' => 'required|string|max:255',
-            'address_line2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:100',
-            'postal_code' => 'required|string|max:20',
-            'country' => 'required|string|max:100',
-            'phone' => 'required|string|max:20',
-            'is_default_shipping' => 'boolean',
-            'is_default_billing' => 'boolean',
-        ]);
-        
-        $address = new Address($request->all());
-        $address->user_id = Auth::id();
-        
-        // Si c'est la première adresse, la définir comme adresse par défaut
-        $addressCount = Address::where('user_id', Auth::id())->count();
-        if ($addressCount === 0) {
-            $address->is_default_shipping = true;
-            $address->is_default_billing = true;
-        } else {
-            // Si la nouvelle adresse est définie comme adresse par défaut, mettre à jour les autres adresses
-            if ($request->has('is_default_shipping') && $request->is_default_shipping) {
-                Address::where('user_id', Auth::id())
-                      ->update(['is_default_shipping' => false]);
-            }
-            
-            if ($request->has('is_default_billing') && $request->is_default_billing) {
-                Address::where('user_id', Auth::id())
-                      ->update(['is_default_billing' => false]);
-            }
+{
+    $request->validate([
+        'full_name' => 'required|string|max:255',
+        'address_line1' => 'required|string|max:255',
+        'address_line2' => 'nullable|string|max:255',
+        'city' => 'required|string|max:100',
+        'postal_code' => 'required|string|max:20',
+        'country' => 'required|string|max:100',
+        'phone' => 'required|string|max:20',
+        'name' => 'required|string|max:255', // Assurez-vous que le nom de l'adresse soit valide
+        'type' => 'required|in:shipping,billing,both', // Assurez-vous que le type soit valide
+        'is_default' => 'nullable|boolean', // Validation pour le checkbox is_default
+    ]);
+    
+    // Créer une nouvelle instance d'adresse
+    $address = new Address($request->all());
+    $address->user_id = Auth::id();
+    
+    // Si c'est la première adresse, la définir comme adresse par défaut
+    $addressCount = Address::where('user_id', Auth::id())->count();
+    
+    if ($addressCount === 0 || $request->has('is_default')) {
+        // Si c'est la première adresse ou que l'utilisateur veut définir cette adresse comme par défaut
+        $address->is_default_shipping = true;
+        $address->is_default_billing = true;
+    } else {
+        // Si une autre adresse est définie comme adresse par défaut, mettre à jour les autres adresses
+        if ($request->has('is_default_shipping') && $request->is_default_shipping) {
+            Address::where('user_id', Auth::id())
+                  ->update(['is_default_shipping' => false]);
         }
         
-        $address->save();
-        
-        return redirect()->route('account.addresses')->with('success', 'Adresse ajoutée avec succès.');
+        if ($request->has('is_default_billing') && $request->is_default_billing) {
+            Address::where('user_id', Auth::id())
+                  ->update(['is_default_billing' => false]);
+        }
     }
+
+    // Sauvegarder la nouvelle adresse
+    $address->save();
+    
+    return redirect()->route('account.addresses')->with('success', 'Adresse ajoutée avec succès.');
+}
+
     
     /**
      * Afficher le formulaire d'édition d'une adresse
