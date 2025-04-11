@@ -51,6 +51,8 @@ Route::group(['middleware' => 'auth'], function () {
     // ✅ Route pour l'ajout d'adresse
     Route::post('/account/addresses', [AddressController::class, 'store'])->name('account.addresses.store');
 
+
+
     // Routes pour le compte utilisateur (version précédente)
     Route::get('/account', [CustomerController::class, 'index'])->name('account.index');
     Route::get('/account/orders', [CustomerController::class, 'orders'])->name('account.orders');

@@ -57,14 +57,14 @@ class CustomerController extends Controller
      */
     public function showOrder(Order $order)
     {
-        // Vérifier que la commande appartient bien à l'utilisateur
+        // Vérifier que la commande appartient à l'utilisateur connecté
         if ($order->user_id !== Auth::id()) {
             return redirect()->route('account.orders')->with('error', 'Accès non autorisé');
         }
         
-        return view('account.order-details', compact('order'));
+        return view('orders.show', compact('order'));
     }
-
+    
     /**
      * Display all customer addresses
      */
