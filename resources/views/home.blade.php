@@ -44,6 +44,34 @@
             
             <!-- Placeholder pour les filtres de produits qui seront ajoutés via AJAX -->
             <div id="product-filters"></div>
+            @if(auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Super Admin'))
+    <div class="card mt-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">🛎 Notifications</h6>
+            @if(auth()->user()->unreadNotifications->count() > 0)
+                <span class="badge bg-danger">{{ auth()->user()->unreadNotifications->count() }}</span>
+            @endif
+        </div>
+        <div class="card-body p-2" style="max-height: 250px; overflow-y: auto;">
+            <ul class="list-group list-group-flush">
+                @forelse(auth()->user()->notifications->take(5) as $notification)
+                    <li class="list-group-item small">
+                        <div><strong>{{ $notification->data['title'] }}</strong></div>
+                        <div>
+                            <a href="{{ route('orders.show', $notification->data['order_id']) }}">
+                                Commande #{{ $notification->data['order_number'] }}
+                            </a> – {{ number_format($notification->data['total'], 2, ',', ' ') }} €
+                        </div>
+                        <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
+                    </li>
+                @empty
+                    <li class="list-group-item text-muted">Aucune notification</li>
+                @endforelse
+            </ul>
+        </div>
+    </div>
+@endif
+
         </div>
         
         <!-- Zone principale - Les produits -->

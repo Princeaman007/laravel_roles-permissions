@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use App\Mail\OrderConfirmationMail;
+use App\Models\User;
+use App\Notifications\NewOrderNotification;
 
 class CheckoutController extends Controller
 {
@@ -110,6 +112,14 @@ class CheckoutController extends Controller
             // ✅ ENVOI DE L'EMAIL DE CONFIRMATION
             Mail::to(Auth::user()->email)->send(new OrderConfirmationMail($order));
 
+            // Notifier tous les admins
+            $admins = User::whereHas('roles', function ($q) {
+                $q->whereIn('name', ['Admin', 'Super Admin']);
+            })->get();
+
+            foreach ($admins as $admin) {
+                $admin->notify(new NewOrderNotification($order));
+            }
             return redirect()->route('checkout.success', $order)->with('success', 'Commande validée avec succès');
         } catch (\Exception $e) {
             DB::rollBack();
