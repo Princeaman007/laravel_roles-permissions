@@ -34,7 +34,6 @@ Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/shop/{category:slug}', [ShopController::class, 'category'])->name('shop.category');
 Route::get('/product/{product:slug}', [ShopController::class, 'product'])->name('shop.product');
 
-// ...
 // Routes du panier
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
@@ -48,37 +47,33 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
     Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
 
-    // ✅ Route pour l'ajout d'adresse
-    Route::post('/account/addresses', [AddressController::class, 'store'])->name('account.addresses.store');
-
-
-
-    // Routes pour le compte utilisateur (version précédente)
-    Route::get('/account', [CustomerController::class, 'index'])->name('account.index');
-    Route::get('/account/orders', [CustomerController::class, 'orders'])->name('account.orders');
-    Route::get('/account/orders/{order}', [CustomerController::class, 'showOrder'])->name('account.orders.show');
-    Route::get('/account/addresses', [CustomerController::class, 'addresses'])->name('account.addresses');
-    Route::post('/account/addresses', [CustomerController::class, 'storeAddress'])->name('account.addresses.store');
-
     // Nouvelles routes pour le compte utilisateur avec AccountController
     Route::prefix('account')->name('account.')->group(function () {
+        // Tableau de bord
+        Route::get('/', [AccountController::class, 'index'])->name('index');
+        
+        // Commandes
+        Route::get('/orders', [AccountController::class, 'orders'])->name('orders');
+        Route::get('/orders/{order}', [AccountController::class, 'showOrder'])->name('orders.show');
+        
         // Profil utilisateur
         Route::get('/profile', [AccountController::class, 'profile'])->name('profile');
         Route::put('/profile', [AccountController::class, 'updateProfile'])->name('profile.update');
-
-        // Routes complémentaires pour les adresses
-        Route::get('/addresses/create', [AccountController::class, 'createAddress'])->name('addresses.create');
-        Route::get('/addresses/{address}/edit', [AccountController::class, 'editAddress'])->name('addresses.edit');
-        Route::put('/addresses/{address}', [AccountController::class, 'updateAddress'])->name('addresses.update');
-        Route::delete('/addresses/{address}', [AccountController::class, 'destroyAddress'])->name('addresses.destroy');
-        Route::post('/addresses/{address}/default', [AccountController::class, 'setDefaultAddress'])->name('addresses.default');
 
         // Liste de souhaits
         Route::get('/wishlist', [AccountController::class, 'wishlist'])->name('wishlist');
         Route::post('/wishlist/add', [AccountController::class, 'addToWishlist'])->name('wishlist.add');
         Route::delete('/wishlist/{wishlistItem}', [AccountController::class, 'removeFromWishlist'])->name('wishlist.remove');
+        
+        // Routes pour les adresses avec AddressController
+        Route::get('/addresses', [AddressController::class, 'index'])->name('addresses');
+        Route::get('/addresses/create', [AddressController::class, 'create'])->name('addresses.create');
+        Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
+        Route::get('/addresses/{address}/edit', [AddressController::class, 'edit'])->name('addresses.edit');
+        Route::put('/addresses/{address}', [AddressController::class, 'update'])->name('addresses.update');
+        Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
     });
-}); // ✅ L’accolade fermante correcte est ici maintenant
+}); 
 
 // Routes admin (protégées)
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:Admin|Super Admin|Shop Manager']], function () {

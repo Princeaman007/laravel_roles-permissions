@@ -144,36 +144,38 @@
                 </div>
                 
                 <!-- Adresse de livraison par défaut -->
-                <div class="col-md-6 mb-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Adresse de livraison</h5>
-                            <a href="{{ route('account.addresses') }}" class="btn btn-sm btn-outline-primary">Gérer</a>
-                        </div>
-                        <div class="card-body">
-                            @if(isset($defaultShippingAddress))
-                                <address>
-                                    <strong>{{ $defaultShippingAddress->full_name }}</strong><br>
-                                    {{ $defaultShippingAddress->address_line1 }}<br>
-                                    @if($defaultShippingAddress->address_line2)
-                                        {{ $defaultShippingAddress->address_line2 }}<br>
-                                    @endif
-                                    {{ $defaultShippingAddress->postal_code }} {{ $defaultShippingAddress->city }}<br>
-                                    {{ $defaultShippingAddress->country }}<br>
-                                    <abbr title="Téléphone">Tél:</abbr> {{ $defaultShippingAddress->phone }}
-                                </address>
-                            @else
-                                <div class="text-center py-4">
-                                    <i class="fas fa-map-marker-alt fa-3x text-muted mb-3"></i>
-                                    <p>Vous n'avez pas encore d'adresse de livraison.</p>
-                                    <a href="{{ route('account.addresses.create') }}" class="btn btn-primary">
-                                        Ajouter une adresse
-                                    </a>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
+                <!-- Adresse de livraison par défaut -->
+<div class="col-md-6 mb-4">
+    <div class="card shadow-sm h-100">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Adresse de livraison</h5>
+            <a href="{{ route('account.addresses') }}" class="btn btn-sm btn-outline-primary">Gérer</a>
+        </div>
+        <div class="card-body">
+            @if($defaultShippingAddress)
+                <address>
+                    <strong>{{ $defaultShippingAddress->full_name ?? $defaultShippingAddress->name }}</strong><br>
+                    {{ $defaultShippingAddress->address_line1 }}<br>
+                    @if($defaultShippingAddress->address_line2)
+                        {{ $defaultShippingAddress->address_line2 }}<br>
+                    @endif
+                    {{ $defaultShippingAddress->postal_code }} {{ $defaultShippingAddress->city }}<br>
+                    {{ $defaultShippingAddress->country }}<br>
+                    <abbr title="Téléphone">Tél:</abbr> {{ $defaultShippingAddress->phone }}
+                </address>
+            @else
+                <div class="text-center py-4">
+                    <i class="fas fa-map-marker-alt fa-3x text-muted mb-3"></i>
+                    <p>Aucune adresse de livraison par défaut n'a été trouvée.</p>
+                    <a href="{{ route('account.addresses.create') }}" class="btn btn-primary">
+                        Ajouter une adresse
+                    </a>
                 </div>
+            @endif
+        </div>
+    </div>
+</div>
+
                 
                 <!-- Liste de souhaits -->
                 <div class="col-md-6 mb-4">

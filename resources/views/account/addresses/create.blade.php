@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Ajouter une adresse')
+
 @section('content')
 <!-- Modal pour ajouter une adresse -->
 <div class="modal fade show" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-modal="true" style="display: block;">

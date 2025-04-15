@@ -22,20 +22,37 @@ class CustomerController extends Controller
     /**
      * Display the customer dashboard
      */
-    public function index()
-    {
-        $user = Auth::user();
-        // Récupérer les 3 dernières commandes
-        $recentOrders = Order::where('user_id', $user->id)
-                            ->orderBy('created_at', 'desc')
-                            ->limit(5)
-                            ->get();
-                            
-        // Récupérer le nombre d'adresses de l'utilisateur
-        $addressCount = Address::where('user_id', $user->id)->count();
-        
-        return view('account.index', compact('user', 'recentOrders', 'addressCount'));
-    }
+   /**
+ * Display the customer dashboard
+ */
+/**
+ * Display the customer dashboard
+ */
+/**
+ * Display the customer dashboard
+ */
+public function index()
+{
+    $user = Auth::user();
+
+    $recentOrders = Order::where('user_id', $user->id)
+        ->latest()
+        ->take(5)
+        ->get();
+
+    $addressCount = $user->addresses()->count();
+
+    // ✅ Appel centralisé
+    $defaultShippingAddress = $user->defaultShippingAddress();
+
+    return view('account.index', compact(
+        'user',
+        'recentOrders',
+        'addressCount',
+        'defaultShippingAddress'
+    ));
+}
+
 
     /**
      * Display all customer orders

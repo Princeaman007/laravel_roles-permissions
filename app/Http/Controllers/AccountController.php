@@ -28,8 +28,16 @@ class AccountController extends Controller
         
         // Récupérer l'adresse de livraison par défaut
         $defaultShippingAddress = Address::where('user_id', $user->id)
-                                      ->where('is_default_shipping', true)
-                                      ->first();
+    ->where('is_default_shipping', true)
+    ->first();
+
+if (!$defaultShippingAddress) {
+    // fallback sur une adresse de type shipping ou both
+    $defaultShippingAddress = Address::where('user_id', $user->id)
+        ->whereIn('type', ['shipping', 'both'])
+        ->first();
+}
+
         
         // Récupérer les 4 derniers éléments de la liste de souhaits
         $wishlistItems = WishlistItem::where('user_id', $user->id)
