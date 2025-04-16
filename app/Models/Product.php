@@ -122,4 +122,28 @@ class Product extends Model
     {
         return $query->where('stock', '>', 0);
     }
+
+    public function isInWishlist()
+{
+    if (!auth()->check()) return false;
+
+    return $this->wishlistItems()
+                ->where('user_id', auth()->id())
+                ->exists();
+}
+
+public function wishlistItems()
+{
+    return $this->hasMany(WishlistItem::class);
+}
+
+public function getImageUrlAttribute()
+{
+    if (!$this->image) {
+        return 'https://via.placeholder.com/150';
+    }
+
+    return asset('storage/' . $this->image);
+}
+
 }

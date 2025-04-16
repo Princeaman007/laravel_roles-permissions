@@ -1,38 +1,31 @@
-@extends('layouts.app')
-
-@section('content')
-
-<div class="row justify-content-center">
-    <div class="col-md-8">
-
-        <div class="card">
-            <div class="card-header">
-                <div class="float-start">
-                    Product Information
-                </div>
-                <div class="float-end">
-                    <a href="{{ route('products.index') }}" class="btn btn-primary btn-sm">&larr; Back</a>
-                </div>
-            </div>
-            <div class="card-body">
-
-                    <div class="row">
-                        <label for="name" class="col-md-4 col-form-label text-md-end text-start"><strong>Name:</strong></label>
-                        <div class="col-md-6" style="line-height: 35px;">
-                            {{ $product->name }}
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <label for="description" class="col-md-4 col-form-label text-md-end text-start"><strong>Description:</strong></label>
-                        <div class="col-md-6" style="line-height: 35px;">
-                            {{ $product->description }}
-                        </div>
-                    </div>
+@if (auth()->check())
+<div class="row mt-4">
+    <div class="col-md-12 text-center">
+        @if ($product->isInWishlist())
+            <form action="{{ route('wishlist.remove', ['product' => $product->id]) }}" method="POST">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger">
+                    💔 Retirer de ma wishlist
+                </button>
+            </form>
+        @else
+        <form action="{{ route('wishlist.add', ['product' => $product->id]) }}" method="POST">
+            @csrf
+            <button type="submit" class="btn btn-outline-danger">
+                ❤️ Ajouter à ma wishlist
+            </button>
+        </form>
         
-            </div>
-        </div>
-    </div>    
+        @endif
+    </div>
 </div>
-    
-@endsection
+@else
+<div class="row mt-4">
+    <div class="col-md-12 text-center">
+        <a href="{{ route('login') }}" class="btn btn-outline-secondary">
+            Connectez-vous pour ajouter à votre wishlist
+        </a>
+    </div>
+</div>
+@endif

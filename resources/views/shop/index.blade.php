@@ -4,25 +4,6 @@
 <div class="container">
     <div class="row">
         <div class="col-md-3">
-            {{-- <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">Catégories</h5>
-                </div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        @forelse ($categories ?? [] as $cat)
-                            <li class="list-group-item">
-                                <a href="{{ route('shop.category', $cat->slug) }}" class="text-decoration-none">
-                                    {{ $cat->name }}
-                                </a>
-                            </li>
-                        @empty
-                            <li class="list-group-item">Aucune catégorie disponible</li>
-                        @endforelse
-                    </ul>
-                </div>
-            </div> --}}
-
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">Filtres</h5>
@@ -69,15 +50,28 @@
                                     <span class="text-muted">Pas d'image</span>
                                 </div>
                             @endif
+                        
+                            {{-- ✅ Une seule card-body --}}
                             <div class="card-body">
                                 <h5 class="card-title">{{ $product->name }}</h5>
                                 <p class="card-text">{{ \Illuminate\Support\Str::limit($product->description, 100) }}</p>
-                                <div class="d-flex justify-content-between align-items-center">
+                        
+                                <div class="d-flex justify-content-between align-items-center mb-2">
                                     <span class="h5">{{ number_format($product->price ?? 0, 2) }} €</span>
                                     <a href="{{ route('shop.product', $product->slug) }}" class="btn btn-primary">Voir</a>
                                 </div>
+                        
+                                {{-- ❤️ Wishlist button --}}
+                                <form action="{{ route('wishlist.add', ['product' => $product->id]) }}" method="POST">
+
+                                    @csrf
+                                    <button type="submit" class="btn btn-outline-danger w-100">
+                                        <i class="bi bi-heart"></i> Ajouter à la wishlist
+                                    </button>
+                                </form>
                             </div>
                         </div>
+                        
                     </div>
                 @empty
                     <div class="col-12">

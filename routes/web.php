@@ -14,6 +14,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Account\AddressController;
+use App\Http\Controllers\WishlistController;
 
 Auth::routes();
 
@@ -33,6 +34,7 @@ Route::resources([
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/shop/{category:slug}', [ShopController::class, 'category'])->name('shop.category');
 Route::get('/product/{product:slug}', [ShopController::class, 'product'])->name('shop.product');
+Route::get('/produit/{slug}', [ProductController::class, 'show'])->name('product.show');
 
 // Routes du panier
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -62,8 +64,8 @@ Route::group(['middleware' => 'auth'], function () {
 
         // Liste de souhaits
         Route::get('/wishlist', [AccountController::class, 'wishlist'])->name('wishlist');
-        Route::post('/wishlist/add', [AccountController::class, 'addToWishlist'])->name('wishlist.add');
-        Route::delete('/wishlist/{wishlistItem}', [AccountController::class, 'removeFromWishlist'])->name('wishlist.remove');
+        // Route::post('/wishlist/add', [AccountController::class, 'addToWishlist'])->name('wishlist.add');
+        // Route::delete('/wishlist/{wishlistItem}', [AccountController::class, 'removeFromWishlist'])->name('wishlist.remove');
         
         // Routes pour les adresses avec AddressController
         Route::get('/addresses', [AddressController::class, 'index'])->name('addresses');
@@ -81,4 +83,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:Admin|Super Ad
         'categories' => CategoryController::class,
         'orders' => OrderController::class,
     ]);
+});
+
+Route::middleware('auth')->group(function () {
+    Route::post('/wishlist/{product}', [WishlistController::class, 'add'])->name('wishlist.add');
+    Route::delete('/wishlist/{product}', [WishlistController::class, 'remove'])->name('wishlist.remove');
 });
