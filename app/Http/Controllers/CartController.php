@@ -15,12 +15,49 @@ class CartController extends Controller
      * Display the shopping cart
      */
     public function index()
-    {
-        $cart = $this->getCart();
-        $cartItems = $cart ? $cart->items : collect([]);
-        
-        return view('cart.index', compact('cart', 'cartItems'));
+{
+    $cart = $this->getCart();
+    $cartItems = $cart ? $cart->items : collect([]);
+
+    // Si le panier est vide, on retourne des totaux à 0
+    if ($cartItems->isEmpty()) {
+        return view('cart.index', [
+            'cart' => $cart,
+            'cartItems' => $cartItems,
+            'totals' => [
+                'subtotal' => 0,
+                'tax' => 0,
+                'shipping_cost' => 0,
+                'discount' => 0,
+                'total' => 0
+            ],
+            'taxRate' => 0.21
+        ]);
     }
+
+    // 💰 Calcul des totaux
+    $taxRate = 0.21; // TVA 21% (Belgique)
+    $shipping = 5.00; // tu peux le rendre dynamique plus tard
+    $discount = 0;
+
+    $subtotal = $cartItems->sum(fn($item) => $item->price * $item->quantity);
+    $tax = $subtotal * $taxRate;
+    $total = $subtotal + $tax + $shipping - $discount;
+
+    return view('cart.index', [
+        'cart' => $cart,
+        'cartItems' => $cartItems,
+        'totals' => [
+            'subtotal' => $subtotal,
+            'tax' => $tax,
+            'shipping_cost' => $shipping,
+            'discount' => $discount,
+            'total' => $total
+        ],
+        'taxRate' => $taxRate
+    ]);
+}
+
     
     /**
      * Add a product to the cart
@@ -31,38 +68,51 @@ class CartController extends Controller
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1'
         ]);
-        
+    
         $product = Product::findOrFail($request->product_id);
-        
+    
         if (!$product->is_active) {
-            return redirect()->back()->with('error', 'Ce produit n\'est pas disponible');
+            return redirect()->back()->with('error', 'Ce produit n\'est pas disponible.');
         }
-        
+    
+        if ($product->stock === 0) {
+            return redirect()->back()->with('error', 'Ce produit est actuellement en rupture de stock.');
+        }
+    
         $cart = $this->getCart(true); // true = créer si n'existe pas
-        
+    
         // Vérifier si le produit est déjà dans le panier
         $cartItem = CartItem::where('cart_id', $cart->id)
-                          ->where('product_id', $product->id)
-                          ->first();
-        
+                            ->where('product_id', $product->id)
+                            ->first();
+    
+        $existingQty = $cartItem ? $cartItem->quantity : 0;
+        $requestedQty = $request->quantity;
+        $newTotalQty = $existingQty + $requestedQty;
+    
+        if ($newTotalQty > $product->stock) {
+            return redirect()->back()->with('error', "Vous avez demandé $requestedQty unités (déjà $existingQty dans le panier), mais il ne reste que {$product->stock} en stock.");
+        }
+    
         if ($cartItem) {
             // Mettre à jour la quantité
-            $cartItem->quantity += $request->quantity;
+            $cartItem->quantity = $newTotalQty;
             $cartItem->save();
         } else {
             // Ajouter nouveau produit
             CartItem::create([
                 'cart_id' => $cart->id,
                 'product_id' => $product->id,
-                'quantity' => $request->quantity,
+                'quantity' => $requestedQty,
                 'price' => $product->discount_price ?? $product->price
             ]);
         }
-        
+    
         $this->updateCartItemsCount($cart);
-        
-        return redirect()->back()->with('success', 'Produit ajouté au panier');
+    
+        return redirect()->back()->with('success', 'Produit ajouté au panier.');
     }
+    
     
     /**
      * Update cart items quantity
