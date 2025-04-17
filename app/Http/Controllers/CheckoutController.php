@@ -26,23 +26,33 @@ class CheckoutController extends Controller
      * Display the checkout page
      */
     public function index()
-    {
-        $cart = Cart::where('user_id', Auth::id())->first();
+{
+    $cart = Cart::with('items.product')->where('user_id', Auth::id())->first();
 
-        if (!$cart || $cart->items->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'Votre panier est vide');
-        }
-
-        $addresses = Address::where('user_id', Auth::id())->get();
-        $defaultAddress = $addresses->where('is_default', true)->first();
-
-        $total = 0;
-        foreach ($cart->items as $item) {
-            $total += $item->price * $item->quantity;
-        }
-
-        return view('checkout.index', compact('cart', 'addresses', 'defaultAddress', 'total'));
+    if (!$cart || $cart->items->isEmpty()) {
+        return redirect()->route('cart.index')->with('error', 'Votre panier est vide');
     }
+
+    $addresses = Address::where('user_id', Auth::id())->get();
+    $defaultAddress = $addresses->where('is_default', true)->first();
+
+    // 💰 Calculs des montants
+    $taxRate = config('tva.rate', 0.21); // Configurable
+    $shipping = 5.00; // Peut être dynamique plus tard
+    $discount = 0;
+
+    $subtotal = $cart->items->sum(function ($item) {
+        return $item->price * $item->quantity;
+    });
+
+    $tax = $subtotal * $taxRate;
+    $total = $subtotal + $tax + $shipping - $discount;
+
+    $totals = compact('subtotal', 'tax', 'shipping', 'discount', 'total');
+
+    return view('checkout.index', compact('cart', 'addresses', 'defaultAddress', 'totals', 'taxRate'));
+}
+
 
     /**
      * Process the checkout

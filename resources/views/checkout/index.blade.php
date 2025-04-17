@@ -152,24 +152,41 @@
                             @endforeach
                         @endif
                     </div>
-
+        
                     <hr>
-
+        
                     <div class="d-flex justify-content-between mb-2">
                         <div>Sous-total</div>
-                        <div>{{ isset($total) ? number_format($total, 2, ',', ' ') : '0,00' }} €</div>
+                        <div>{{ number_format($totals['subtotal'], 2, ',', ' ') }} €</div>
                     </div>
+        
+                    <div class="d-flex justify-content-between mb-2">
+                        <div>TVA ({{ $taxRate * 100 }}%)</div>
+                        <div>{{ number_format($totals['tax'], 2, ',', ' ') }} €</div>
+                    </div>
+        
                     <div class="d-flex justify-content-between mb-2">
                         <div>Livraison</div>
-                        <div>Gratuite</div>
+                        <div>{{ number_format($totals['shipping'], 2, ',', ' ') }} €</div>
                     </div>
+        
+                    @if($totals['discount'] > 0)
+                        <div class="d-flex justify-content-between mb-2 text-danger">
+                            <div>Remise</div>
+                            <div>-{{ number_format($totals['discount'], 2, ',', ' ') }} €</div>
+                        </div>
+                    @endif
+        
+                    <hr>
+        
                     <div class="d-flex justify-content-between fw-bold">
-                        <div>Total</div>
-                        <div>{{ isset($total) ? number_format($total, 2, ',', ' ') : '0,00' }} €</div>
+                        <div>Total TTC</div>
+                        <div>{{ number_format($totals['total'], 2, ',', ' ') }} €</div>
                     </div>
                 </div>
             </div>
         </div>
+        
     </div>
 </div>
 
