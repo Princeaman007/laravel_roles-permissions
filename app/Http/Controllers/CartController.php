@@ -15,48 +15,52 @@ class CartController extends Controller
      * Display the shopping cart
      */
     public function index()
-{
-    $cart = $this->getCart();
-    $cartItems = $cart ? $cart->items : collect([]);
-
-    // Si le panier est vide, on retourne des totaux à 0
-    if ($cartItems->isEmpty()) {
+    {
+        $cart = $this->getCart();
+        $cartItems = $cart ? $cart->items : collect([]);
+    
+        // Si le panier est vide, on retourne des totaux à 0
+        if ($cartItems->isEmpty()) {
+            return view('cart.index', [
+                'cart' => $cart,
+                'cartItems' => $cartItems,
+                'totals' => [
+                    'subtotal' => 0,
+                    'tax' => 0,
+                    'shipping_cost' => 0,
+                    'discount' => 0,
+                    'total' => 0
+                ],
+                'taxRate' => 0.21
+            ]);
+        }
+    
+        // 💰 Calcul des totaux
+        $taxRate = 0.21; // TVA 21% (Belgique)
+        $discount = 0;
+    
+        $subtotal = $cartItems->sum(fn($item) => $item->price * $item->quantity);
+        $tax = $subtotal * $taxRate;
+    
+        // 🚚 Livraison gratuite à partir de 100 €
+        $shipping = $subtotal >= 100 ? 0 : 5.00;
+    
+        $total = $subtotal + $tax + $shipping - $discount;
+    
         return view('cart.index', [
             'cart' => $cart,
             'cartItems' => $cartItems,
             'totals' => [
-                'subtotal' => 0,
-                'tax' => 0,
-                'shipping_cost' => 0,
-                'discount' => 0,
-                'total' => 0
+                'subtotal' => $subtotal,
+                'tax' => $tax,
+                'shipping_cost' => $shipping,
+                'discount' => $discount,
+                'total' => $total
             ],
-            'taxRate' => 0.21
+            'taxRate' => $taxRate
         ]);
     }
-
-    // 💰 Calcul des totaux
-    $taxRate = 0.21; // TVA 21% (Belgique)
-    $shipping = 5.00; // tu peux le rendre dynamique plus tard
-    $discount = 0;
-
-    $subtotal = $cartItems->sum(fn($item) => $item->price * $item->quantity);
-    $tax = $subtotal * $taxRate;
-    $total = $subtotal + $tax + $shipping - $discount;
-
-    return view('cart.index', [
-        'cart' => $cart,
-        'cartItems' => $cartItems,
-        'totals' => [
-            'subtotal' => $subtotal,
-            'tax' => $tax,
-            'shipping_cost' => $shipping,
-            'discount' => $discount,
-            'total' => $total
-        ],
-        'taxRate' => $taxRate
-    ]);
-}
+    
 
     
     /**
