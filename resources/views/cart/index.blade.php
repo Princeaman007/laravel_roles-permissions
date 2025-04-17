@@ -89,30 +89,44 @@
         </div>
 
         <!-- Résumé du panier -->
-        <div class="row mt-4">
-            <div class="col-md-6 ms-auto">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-light">
-                        <h5 class="mb-0">Résumé de la commande</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Sous-total:</span>
-                            <span>{{ number_format($cart->items->sum(function($item) { return $item->price * $item->quantity; }), 2) }} €</span>
-                        </div>
-                        <div class="d-flex justify-content-between border-top border-bottom py-3 my-2">
-                            <span class="h5 mb-0">Total:</span>
-                            <span class="h5 mb-0">{{ number_format($cart->items->sum(function($item) { return $item->price * $item->quantity; }), 2) }} €</span>
-                        </div>
-                        <div class="mt-3">
-                            <a href="{{ route('checkout.index') }}" class="btn btn-success btn-lg w-100">
-                                <i class="fas fa-lock me-2"></i>Passer à la caisse
-                            </a>
-                        </div>
-                    </div>
-                </div>
+@php
+$subtotalHT = $cart->items->sum(function($item) {
+    return $item->price * $item->quantity;
+});
+$tvaRate = 0.21; // à extraire de la config si besoin
+$tvaAmount = $subtotalHT * $tvaRate;
+$totalTTC = $subtotalHT + $tvaAmount;
+@endphp
+
+<div class="row mt-4">
+<div class="col-md-6 ms-auto">
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Résumé de la commande</h5>
+        </div>
+        <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+                <span>Sous-total (HT) :</span>
+                <span>{{ number_format($subtotalHT, 2) }} €</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span>TVA ({{ $tvaRate * 100 }}%) :</span>
+                <span>{{ number_format($tvaAmount, 2) }} €</span>
+            </div>
+            <div class="d-flex justify-content-between border-top border-bottom py-3 my-2">
+                <span class="h5 mb-0">Total TTC :</span>
+                <span class="h5 mb-0">{{ number_format($totalTTC, 2) }} €</span>
+            </div>
+            <div class="mt-3">
+                <a href="{{ route('checkout.index') }}" class="btn btn-success btn-lg w-100">
+                    <i class="fas fa-lock me-2"></i>Passer à la caisse
+                </a>
             </div>
         </div>
+    </div>
+</div>
+</div>
+
     @else
         <div class="text-center py-5">
             <div class="mb-4">
