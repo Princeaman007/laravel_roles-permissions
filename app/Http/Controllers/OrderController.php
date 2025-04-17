@@ -68,7 +68,19 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         $order->load(['user', 'items.product', 'shippingAddress', 'billingAddress']);
-        return view('orders.show', compact('order'));
+    
+        // Fallback si pas d'adresse dans la commande
+        $defaultShippingAddress = null;
+    
+        if (!$order->shippingAddress && auth()->check()) {
+            $defaultShippingAddress = auth()->user()
+                ->addresses()
+                ->where('is_default', true)
+                ->where('type', 'shipping') // optionnel
+                ->first();
+        }
+    
+        return view('orders.show', compact('order', 'defaultShippingAddress'));
     }
     
     /**

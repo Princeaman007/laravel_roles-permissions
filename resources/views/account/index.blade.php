@@ -174,9 +174,7 @@
             @endif
         </div>
     </div>
-</div>
-
-                
+</div>          
                 <!-- Liste de souhaits -->
                 <div class="col-md-6 mb-4">
                     <div class="card shadow-sm h-100">

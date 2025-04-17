@@ -36,7 +36,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Contenu principal -->
         <div class="col-lg-9">
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -45,7 +45,7 @@
                     <i class="fas fa-arrow-left me-2"></i>Retour aux commandes
                 </a>
             </div>
-            
+
             <div class="row mb-4">
                 <!-- Informations de la commande -->
                 <div class="col-md-6 mb-4">
@@ -62,35 +62,35 @@
                                 <li class="d-flex justify-content-between mb-2">
                                     <span class="text-muted">Statut:</span>
                                     @php
-                                        $statusClass = 'bg-secondary';
-                                        
-                                        if($order->status == 'completed') {
-                                            $statusClass = 'bg-success';
-                                        } elseif($order->status == 'processing') {
-                                            $statusClass = 'bg-primary';
-                                        } elseif($order->status == 'pending') {
-                                            $statusClass = 'bg-warning';
-                                        } elseif($order->status == 'cancelled') {
-                                            $statusClass = 'bg-danger';
-                                        }
+                                    $statusClass = 'bg-secondary';
+
+                                    if($order->status == 'completed') {
+                                    $statusClass = 'bg-success';
+                                    } elseif($order->status == 'processing') {
+                                    $statusClass = 'bg-primary';
+                                    } elseif($order->status == 'pending') {
+                                    $statusClass = 'bg-warning';
+                                    } elseif($order->status == 'cancelled') {
+                                    $statusClass = 'bg-danger';
+                                    }
                                     @endphp
-                                    
+
                                     <span class="badge {{ $statusClass }}">
                                         @switch($order->status)
-                                            @case('pending')
-                                                En attente
-                                                @break
-                                            @case('processing')
-                                                En traitement
-                                                @break
-                                            @case('completed')
-                                                Terminée
-                                                @break
-                                            @case('cancelled')
-                                                Annulée
-                                                @break
-                                            @default
-                                                {{ $order->status }}
+                                        @case('pending')
+                                        En attente
+                                        @break
+                                        @case('processing')
+                                        En traitement
+                                        @break
+                                        @case('completed')
+                                        Terminée
+                                        @break
+                                        @case('cancelled')
+                                        Annulée
+                                        @break
+                                        @default
+                                        {{ $order->status }}
                                         @endswitch
                                     </span>
                                 </li>
@@ -108,35 +108,51 @@
                         </div>
                     </div>
                 </div>
-                
-                <!-- Adresse de livraison -->
+
                 <div class="col-md-6 mb-4">
                     <div class="card shadow-sm h-100">
                         <div class="card-header bg-light">
                             <h5 class="mb-0">Adresse de livraison</h5>
                         </div>
                         <div class="card-body">
-                            @if(isset($order->shipping_address))
+                            @if($order->shippingAddress)
                                 <address class="mb-0">
-                                    <strong>{{ $order->shipping_name }}</strong><br>
-                                    {{ $order->shipping_address }}<br>
-                                    @if($order->shipping_address2)
-                                        {{ $order->shipping_address2 }}<br>
+                                    <strong>{{ $order->shippingAddress->full_name ?? $order->shippingAddress->name }}</strong><br>
+                                    {{ $order->shippingAddress->address_line1 }}<br>
+                                    @if($order->shippingAddress->address_line2)
+                                        {{ $order->shippingAddress->address_line2 }}<br>
                                     @endif
-                                    {{ $order->shipping_postcode }} {{ $order->shipping_city }}<br>
-                                    {{ $order->shipping_country }}<br>
-                                    @if($order->shipping_phone)
-                                        <abbr title="Téléphone">Tél:</abbr> {{ $order->shipping_phone }}
+                                    {{ $order->shippingAddress->postal_code }} {{ $order->shippingAddress->city }}<br>
+                                    {{ $order->shippingAddress->country }}<br>
+                                    @if($order->shippingAddress->phone)
+                                        <abbr title="Téléphone">Tél:</abbr> {{ $order->shippingAddress->phone }}
+                                    @endif
+                                </address>
+                            @elseif(isset($defaultShippingAddress) && $defaultShippingAddress)
+                                <address class="mb-0">
+                                    <strong>{{ $defaultShippingAddress->full_name ?? $defaultShippingAddress->name }}</strong><br>
+                                    {{ $defaultShippingAddress->address_line1 }}<br>
+                                    @if($defaultShippingAddress->address_line2)
+                                        {{ $defaultShippingAddress->address_line2 }}<br>
+                                    @endif
+                                    {{ $defaultShippingAddress->postal_code }} {{ $defaultShippingAddress->city }}<br>
+                                    {{ $defaultShippingAddress->country }}<br>
+                                    @if($defaultShippingAddress->phone)
+                                        <abbr title="Téléphone">Tél:</abbr> {{ $defaultShippingAddress->phone }}
                                     @endif
                                 </address>
                             @else
-                                <p class="text-muted mb-0">Aucune adresse de livraison</p>
+                                <div class="text-center py-3">
+                                    <i class="fas fa-map-marker-alt fa-2x text-muted mb-2"></i>
+                                    <p class="mb-0">Aucune adresse de livraison disponible pour cette commande.</p>
+                                </div>
                             @endif
                         </div>
                     </div>
                 </div>
+                
             </div>
-            
+
             <!-- Produits commandés -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-light">
@@ -155,33 +171,35 @@
                             </thead>
                             <tbody>
                                 @foreach($order->items as $item)
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                @if(isset($item->product) && $item->product->image)
-                                                    <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product_name }}" class="img-thumbnail me-3" style="width: 50px; height: 50px; object-fit: cover;">
-                                                @else
-                                                    <div class="bg-light me-3" style="width: 50px; height: 50px;"></div>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            @if(isset($item->product) && $item->product->image)
+                                            <img src="{{ asset('storage/' . $item->product->image) }}"
+                                                alt="{{ $item->product_name }}" class="img-thumbnail me-3"
+                                                style="width: 50px; height: 50px; object-fit: cover;">
+                                            @else
+                                            <div class="bg-light me-3" style="width: 50px; height: 50px;"></div>
+                                            @endif
+                                            <div>
+                                                <h6 class="mb-0">{{ $item->product_name }}</h6>
+                                                @if($item->options)
+                                                <small class="text-muted">{{ $item->options }}</small>
                                                 @endif
-                                                <div>
-                                                    <h6 class="mb-0">{{ $item->product_name }}</h6>
-                                                    @if($item->options)
-                                                        <small class="text-muted">{{ $item->options }}</small>
-                                                    @endif
-                                                </div>
                                             </div>
-                                        </td>
-                                        <td class="text-center">{{ number_format($item->price, 2) }} €</td>
-                                        <td class="text-center">{{ $item->quantity }}</td>
-                                        <td class="text-end">{{ number_format($item->price * $item->quantity, 2) }} €</td>
-                                    </tr>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">{{ number_format($item->price, 2) }} €</td>
+                                    <td class="text-center">{{ $item->quantity }}</td>
+                                    <td class="text-end">{{ number_format($item->price * $item->quantity, 2) }} €</td>
+                                </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Résumé de la commande -->
             <div class="row">
                 <div class="col-md-6 ms-auto">
