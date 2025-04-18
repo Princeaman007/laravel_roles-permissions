@@ -89,3 +89,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/wishlist/{product}', [WishlistController::class, 'add'])->name('wishlist.add');
     Route::delete('/wishlist/{product}', [WishlistController::class, 'remove'])->name('wishlist.remove');
 });
+
+// Routes pour la gestion des statuts de commande
+Route::patch('orders/{order}/update-status', [App\Http\Controllers\OrderController::class, 'updateStatus'])
+    ->name('orders.updateStatus')
+    ->middleware('permission:process-order');
+
+Route::patch('orders/{order}/cancel', [App\Http\Controllers\OrderController::class, 'cancel'])
+    ->name('orders.cancel')
+    ->middleware('permission:cancel-order');

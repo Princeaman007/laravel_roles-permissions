@@ -6,6 +6,7 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+
 class OrderController extends Controller
 {
     /**
@@ -65,24 +66,31 @@ class OrderController extends Controller
     /**
      * Display the specified order.
      */
-    public function show(Order $order)
-    {
-        $order->load(['user', 'items.product', 'shippingAddress', 'billingAddress']);
+    /**
+ * Display the specified order.
+ */
+public function show(Order $order, Request $request)
+{
+    $order->load(['user', 'items.product', 'shippingAddress', 'billingAddress']);
+
     
-        // Fallback si pas d'adresse dans la commande
-        $defaultShippingAddress = null;
-    
-        if (!$order->shippingAddress && auth()->check()) {
-            $defaultShippingAddress = auth()->user()
-                ->addresses()
-                ->where('is_default', true)
-                ->where('type', 'shipping') // optionnel
-                ->first();
-        }
-    
-        return view('orders.show', compact('order', 'defaultShippingAddress'));
+    if ($request->has('invoice')) {
+        return view('orders.invoice', compact('order'));
     }
     
+    // Fallback si pas d'adresse dans la commande
+    $defaultShippingAddress = null;
+
+    if (!$order->shippingAddress && auth()->check()) {
+        $defaultShippingAddress = auth()->user()
+            ->addresses()
+            ->where('is_default', true)
+            ->where('type', 'shipping') // optionnel
+            ->first();
+    }
+
+    return view('orders.show', compact('order', 'defaultShippingAddress'));
+}
     /**
      * Update the status of the specified order.
      */
