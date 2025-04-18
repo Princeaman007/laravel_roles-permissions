@@ -46,7 +46,8 @@
                             Catégories
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarCategories">
-                            @foreach(App\Models\Category::where('is_active', true)->take(6)->get() as $category)
+                            @foreach(App\Models\Category::where('is_active', true)->orderBy('name')->get() as $category)
+
                                 <li>
                                     <a class="dropdown-item" href="{{ route('shop.category', $category->slug) }}">
                                         {{ $category->name }}

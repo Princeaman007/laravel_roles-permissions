@@ -67,7 +67,8 @@ class CategoryController extends Controller
             $category->slug = $slug;
             $category->description = $request->description;
             $category->parent_id = $request->parent_id;
-            $category->is_active = $request->has('is_active') ? 1 : 0;
+            $category->is_active = $request->input('is_active', 0);
+
             $category->save();
             
             return redirect()->route('categories.index')->with('success', 'Catégorie créée avec succès');
@@ -92,54 +93,54 @@ class CategoryController extends Controller
      * Update the specified category in storage.
      */
     public function update(Request $request, Category $category)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'parent_id' => 'nullable|exists:categories,id',
-            'is_active' => 'boolean'
-        ]);
-        
-        // Vérifier que la catégorie parent n'est pas la catégorie elle-même
-        if ($request->parent_id == $category->id) {
-            return redirect()->back()->with('error', 'Une catégorie ne peut pas être sa propre catégorie parent');
-        }
-        
-        // Vérifier que la catégorie parent n'est pas un enfant de la catégorie
-        if ($request->parent_id) {
-            $childIds = $this->getAllChildIds($category->id);
-            if (in_array($request->parent_id, $childIds)) {
-                return redirect()->back()->with('error', 'Une catégorie ne peut pas avoir une de ses sous-catégories comme parent');
-            }
-        }
-        
-        try {
-            $category->name = $request->name;
-            
-            // Ne mettre à jour le slug que si le nom a changé
-            if ($category->name != $request->name) {
-                $slug = Str::slug($request->name);
-                $count = Category::where('slug', 'LIKE', $slug . '%')
-                                ->where('id', '!=', $category->id)
-                                ->count();
-                                
-                if ($count > 0) {
-                    $slug = $slug . '-' . ($count + 1);
-                }
-                
-                $category->slug = $slug;
-            }
-            
-            $category->description = $request->description;
-            $category->parent_id = $request->parent_id;
-            $category->is_active = $request->has('is_active') ? 1 : 0;
-            $category->save();
-            
-            return redirect()->route('categories.index')->with('success', 'Catégorie mise à jour avec succès');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Une erreur est survenue lors de la mise à jour de la catégorie');
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'parent_id' => 'nullable|exists:categories,id',
+    ]);
+
+    // Vérifie les relations parentales interdites
+    if ($request->parent_id == $category->id) {
+        return back()->with('error', 'Une catégorie ne peut pas être sa propre catégorie parent');
+    }
+
+    if ($request->parent_id) {
+        $childIds = $this->getAllChildIds($category->id);
+        if (in_array($request->parent_id, $childIds)) {
+            return back()->with('error', 'Une catégorie ne peut pas avoir une de ses sous-catégories comme parent');
         }
     }
+
+    try {
+        // Si le nom a changé, alors on met à jour le slug
+        if ($category->name !== $request->name) {
+            $slug = Str::slug($request->name);
+            $count = Category::where('slug', 'LIKE', $slug . '%')
+                             ->where('id', '!=', $category->id)
+                             ->count();
+
+            if ($count > 0) {
+                $slug .= '-' . ($count + 1);
+            }
+
+            $category->slug = $slug;
+        }
+
+        $category->name = $request->name;
+        $category->description = $request->description;
+        $category->parent_id = $request->parent_id;
+        $category->is_active = $request->input('is_active', 0); // valeur 0 par défaut
+
+
+        $category->save();
+
+        return redirect()->route('categories.index')->with('success', 'Catégorie mise à jour avec succès');
+    } catch (\Exception $e) {
+        return back()->with('error', 'Une erreur est survenue lors de la mise à jour de la catégorie');
+    }
+}
+
     
     /**
      * Remove the specified category from storage.
