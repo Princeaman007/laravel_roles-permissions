@@ -145,14 +145,6 @@ public function show(Order $order, Request $request)
     {
         $order->load(['user', 'items.product', 'shippingAddress', 'billingAddress']);
         
-        // Ici, vous pourriez générer un PDF pour la facture en utilisant une bibliothèque comme DomPDF
-        // Exemple simplifié :
-        /*
-        $pdf = PDF::loadView('invoices.template', compact('order'));
-        return $pdf->download('facture-'.$order->order_number.'.pdf');
-        */
-        
-        // Pour l'instant, on renvoie simplement vers une vue de facture
         return view('orders.invoice', compact('order'));
     }
 }

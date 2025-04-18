@@ -167,4 +167,10 @@ class Order extends Model
     {
         return $this->items->sum('quantity');
     }
+
+    // Dans App\Models\Order
+public function getTotalAmountAttribute()
+{
+    return $this->total;
+}
 }

@@ -98,3 +98,8 @@ Route::patch('orders/{order}/update-status', [App\Http\Controllers\OrderControll
 Route::patch('orders/{order}/cancel', [App\Http\Controllers\OrderController::class, 'cancel'])
     ->name('orders.cancel')
     ->middleware('permission:cancel-order');
+
+   
+Route::get('orders/{order}/invoice', [App\Http\Controllers\OrderController::class, 'generateInvoice'])
+->name('orders.invoice')
+->middleware('auth');

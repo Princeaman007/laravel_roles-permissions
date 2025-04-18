@@ -217,7 +217,7 @@
                                         </span>
                                     </td>
                                     <td class="text-end fw-bold">
-                                        {{ number_format($order->total_amount, 2, ',', ' ') }} €
+                                        {{ number_format($order->total, 2, ',', ' ') }} €
                                     </td>
                                     <td class="text-center pe-3">
                                         <div class="dropdown">
@@ -238,7 +238,7 @@
                                                 </li>
                                                 @endif
                                                 <li>
-                                                    <a class="dropdown-item" href="{{ route('orders.show', $order) }}?invoice=true">
+                                                    <a class="dropdown-item" href="{{ route('orders.invoice', $order) }}">
                                                         <i class="bi bi-file-earmark-pdf text-danger me-2"></i> Facture
                                                     </a>
                                                 </li>
