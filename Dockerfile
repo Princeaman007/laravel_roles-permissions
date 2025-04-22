@@ -24,17 +24,20 @@ COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 # Installer les dépendances PHP de Laravel
 RUN composer install --no-dev --optimize-autoloader
 
+# Copier ton vrai fichier .env
+COPY .env .env
+
 # Donner les bonnes permissions aux dossiers requis
 RUN chown -R www-data:www-data \
     /var/www/html/storage \
     /var/www/html/bootstrap/cache \
     /var/www/html/public
 
-# Copier .env.example en .env
-COPY .env.example .env
-
 # Générer la clé de l'application
 RUN php artisan key:generate
+
+# Nettoyer et compiler la config Laravel
+RUN php artisan config:clear && php artisan cache:clear && php artisan config:cache
 
 # Exposer le port utilisé par Apache
 EXPOSE 80
