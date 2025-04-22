@@ -71,11 +71,22 @@
                                 </p>
 
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span class="fw-bold text-primary">{{ number_format($product->price ?? 0, 2) }} €</span>
+                                    <div>
+                                        @if($product->discount_price)
+                                            <span class="fw-bold text-danger">{{ number_format($product->discount_price, 2) }} €</span><br>
+                                            <span class="text-muted text-decoration-line-through small">{{ number_format($product->price, 2) }} €</span>
+                                            <span class="badge bg-danger ms-1 small">
+                                                -{{ round((1 - $product->discount_price / $product->price) * 100) }}%
+                                            </span>
+                                        @else
+                                            <span class="fw-bold text-primary">{{ number_format($product->price ?? 0, 2) }} €</span>
+                                        @endif
+                                    </div>
                                     <a href="{{ route('shop.product', $product->slug) }}" class="btn btn-sm btn-outline-primary">
                                         Voir
                                     </a>
                                 </div>
+                                
 
                                 {{-- ❤️ Wishlist --}}
                                 <form action="{{ route('wishlist.add', ['product' => $product->id]) }}" method="POST">

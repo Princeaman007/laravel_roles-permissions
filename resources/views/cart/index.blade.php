@@ -60,7 +60,20 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>{{ number_format($item->price, 2) }} €</td>
+                                <td>
+                                    @if($item->product->discount_price)
+                                        <div>
+                                            <span class="fw-bold text-danger">{{ number_format($item->product->discount_price, 2) }} €</span><br>
+                                            <span class="text-muted text-decoration-line-through small">{{ number_format($item->product->price, 2) }} €</span>
+                                            <span class="badge bg-danger small ms-1">
+                                                -{{ round((1 - $item->product->discount_price / $item->product->price) * 100) }}%
+                                            </span>
+                                        </div>
+                                    @else
+                                        <span class="fw-bold">{{ number_format($item->product->price, 2) }} €</span>
+                                    @endif
+                                </td>
+                                
                                 <td>
                                     <form action="{{ route('cart.update') }}" method="POST" class="d-inline">
                                         @csrf
@@ -73,7 +86,13 @@
                                         </div>
                                     </form>
                                 </td>
-                                <td class="text-end">{{ number_format($item->price * $item->quantity, 2) }} €</td>
+                                <td class="text-end">
+                                    @php
+                                        $unitPrice = $item->product->discount_price ?? $item->product->price;
+                                    @endphp
+                                    {{ number_format($unitPrice * $item->quantity, 2) }} €
+                                </td>
+                                
                                 <td class="text-end">
                                     <form action="{{ route('cart.remove') }}" method="POST" class="d-inline">
                                         @csrf

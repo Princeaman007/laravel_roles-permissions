@@ -120,14 +120,23 @@
                                     {{ \Illuminate\Support\Str::limit($product->description, 100) }}
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center mt-3">
-                                    <span class="fw-bold text-primary">
-                                        {{ number_format($product->price ?? 0, 2) }} €
-                                    </span>
-                                    <a href="{{ route('shop.product', $product->slug) }}"
-                                       class="btn btn-sm btn-outline-primary">
+                                    <div>
+                                        @if($product->discount_price && $product->discount_price < $product->price)
+                                            <span class="fw-bold text-danger">{{ number_format($product->discount_price, 2) }} €</span><br>
+                                            <span class="text-muted text-decoration-line-through small">{{ number_format($product->price, 2) }} €</span>
+                                            <span class="badge bg-danger small ms-1">
+                                                -{{ round((1 - $product->discount_price / $product->price) * 100) }}%
+                                            </span>
+                                        @else
+                                            <span class="fw-bold text-primary">{{ number_format($product->price ?? 0, 2) }} €</span>
+                                        @endif
+                                    </div>
+                                
+                                    <a href="{{ route('shop.product', $product->slug) }}" class="btn btn-sm btn-outline-primary">
                                         Voir
                                     </a>
                                 </div>
+                                
                             </div>
                         </div>
                     </div>

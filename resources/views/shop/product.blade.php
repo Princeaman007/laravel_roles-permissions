@@ -41,7 +41,20 @@
         <div class="col-md-6">
             <h1 class="mb-3 fw-bold">{{ $product->name }}</h1>
 
-            <h3 class="text-primary mb-3">{{ number_format($product->price ?? 0, 2) }} €</h3>
+            <div class="mb-3">
+                @if($product->discount_price)
+                    <h3 class="text-danger fw-bold mb-1">{{ number_format($product->discount_price, 2) }} €</h3>
+                    <div>
+                        <span class="text-muted text-decoration-line-through me-2">{{ number_format($product->price, 2) }} €</span>
+                        <span class="badge bg-danger">
+                            -{{ round((1 - $product->discount_price / $product->price) * 100) }}%
+                        </span>
+                    </div>
+                @else
+                    <h3 class="text-primary fw-bold mb-1">{{ number_format($product->price ?? 0, 2) }} €</h3>
+                @endif
+            </div>
+            
 
             @if($product->stock > 0)
                 <div class="mb-3">
