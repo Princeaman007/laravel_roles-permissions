@@ -6,7 +6,6 @@ RUN apt-get update && apt-get install -y \
     zip unzip curl libzip-dev libonig-dev libxml2-dev netcat-openbsd \
     && docker-php-ext-install pdo pdo_mysql zip mbstring
 
-
 # Activer mod_rewrite pour Laravel
 RUN a2enmod rewrite
 
@@ -22,8 +21,8 @@ WORKDIR /var/www/html
 # Copier Composer depuis une image officielle
 COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 
-# Copier le fichier .env
-COPY .env .env
+# Copier le fichier .env.example s'il existe
+COPY .env.example .env || true
 
 # Installer les dépendances PHP de Laravel
 RUN composer install --no-dev --optimize-autoloader
@@ -34,13 +33,11 @@ RUN chown -R www-data:www-data \
     /var/www/html/bootstrap/cache \
     /var/www/html/public
 
-# Supprimer le cache compilé s’il existe
+# Supprimer le cache compilé s'il existe
 RUN rm -f bootstrap/cache/config.php
 
-# Générer la clé de l'application
-RUN php artisan key:generate
-
-# Nettoyer et recompiler la configuration Laravel
+# Ne pas générer de clé ici - Render le fera avec generateValue: true
+# RUN php artisan key:generate
 
 # Copier le script de démarrage
 COPY start.sh /start.sh
