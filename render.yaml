@@ -21,6 +21,7 @@ services:
         fromService:
           type: private
           name: laravel-mysql
+          property: hostConnectionString # Important : ceci récupère le nom d'hôte interne correct
       - key: DB_PORT
         value: 3306
       - key: DB_DATABASE
@@ -35,11 +36,8 @@ services:
         value: file
       - key: QUEUE_CONNECTION
         value: sync
-
-    startCommand: |
-      php artisan config:cache &&
-      php artisan migrate --force &&
-      apache2-foreground
+    # Je recommande de ne pas utiliser startCommand ici mais plutôt le script start.sh
+    # car il est plus facile à maintenir et à déboguer
 
   - type: private
     name: laravel-mysql
