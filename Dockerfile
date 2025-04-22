@@ -45,8 +45,9 @@ RUN rm -f bootstrap/cache/config.php
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
-# Exposer le port Apache
-EXPOSE 80
+# Configurer le port pour Render
+ENV PORT=8080
+EXPOSE ${PORT}
 
 # Lancer le script au démarrage
 CMD ["/start.sh"]
