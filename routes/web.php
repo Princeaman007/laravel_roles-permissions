@@ -15,6 +15,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Account\AddressController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\ContactController;
 
 Auth::routes();
 
@@ -103,3 +104,7 @@ Route::patch('orders/{order}/cancel', [App\Http\Controllers\OrderController::cla
 Route::get('orders/{order}/invoice', [App\Http\Controllers\OrderController::class, 'generateInvoice'])
 ->name('orders.invoice')
 ->middleware('auth');
+
+Route::get('/contact', [ContactController::class, 'showForm'])->name('contact.form');
+ 
+Route::post('/contact', [ContactController::class, 'sendMail'])->name('contact.send');

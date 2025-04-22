@@ -60,6 +60,20 @@
                             </li>
                         </ul>
                     </li>
+
+                    @guest
+    <li class="nav-item">
+        <a class="nav-link" href="{{ route('contact.form') }}">Contact</a>
+    </li>
+@else
+    @if (!auth()->user()->hasAnyRole(['admin', 'super-admin']))
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('contact.form') }}">Contact</a>
+        </li>
+    @endif
+@endguest
+
+                    
                 </ul>
 
                 <!-- Right Side -->
@@ -134,11 +148,11 @@
                             </ul>
                         </li>
                     @endguest
+                    
                 </ul>
             </div>
         </div>
     </nav>
-
     <main class="py-4">
         <div class="container">
             <div class="row justify-content-center mt-3">
@@ -173,15 +187,15 @@
                         <li><a href="{{ route('shop.index') }}">Boutique</a></li>
                         <li><a href="#">Conditions générales de vente</a></li>
                         <li><a href="#">Politique de confidentialité</a></li>
-                        <li><a href="#">Contact</a></li>
+                        <li><a href="{{ route('contact.form') }}">Contact</a></li>
                     </ul>
                 </div>
                 <div class="col-md-4">
                     <h5>Contact</h5>
                     <ul class="list-unstyled">
-                        <li><i class="bi bi-geo-alt"></i> 123 Rue du Commerce, 75000 Paris</li>
-                        <li><i class="bi bi-envelope"></i> contact@ecommerce.com</li>
-                        <li><i class="bi bi-telephone"></i> +33 1 23 45 67 89</li>
+                        <li><i class="bi bi-geo-alt"></i> Avenue de lille 4 A/52 4020 Liege</li>
+                        <li><i class="bi bi-envelope"></i> tfeetude@gmail.com</li>
+                        <li><i class="bi bi-telephone"></i> +32 467 620 878</li>
                     </ul>
                 </div>
             </div>
