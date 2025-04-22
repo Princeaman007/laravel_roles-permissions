@@ -21,8 +21,10 @@ WORKDIR /var/www/html
 # Copier Composer depuis une image officielle
 COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 
-# Copier le fichier .env.example s'il existe
-COPY .env.example .env || true
+# Au lieu de copier .env, créez-le directement
+RUN echo "APP_NAME=Laravel" > .env && \
+    echo "APP_ENV=production" >> .env && \
+    echo "APP_DEBUG=false" >> .env
 
 # Installer les dépendances PHP de Laravel
 RUN composer install --no-dev --optimize-autoloader
