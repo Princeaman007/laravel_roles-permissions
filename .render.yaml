@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: laravel-roles-permissions
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        generateValue: true
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        value: YOUR_RENDER_MYSQL_SERVICE_NAME
+      - key: DB_PORT
+        value: 3306
+      - key: DB_DATABASE
+        value: laravel
+      - key: DB_USERNAME
+        value: root
+      - key: DB_PASSWORD
+        value: "Monsecretamoi%%%@@@"
