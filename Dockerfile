@@ -1,9 +1,9 @@
 FROM php:8.2-apache
 
-# Active mod_rewrite pour les routes Laravel
+# Active mod_rewrite pour Laravel
 RUN a2enmod rewrite
 
-# Installe les extensions nécessaires
+# Installe les extensions PHP nécessaires
 RUN apt-get update && apt-get install -y \
     git unzip curl libzip-dev libonig-dev libxml2-dev zip \
     && docker-php-ext-install pdo pdo_mysql zip
@@ -11,20 +11,24 @@ RUN apt-get update && apt-get install -y \
 # Installe Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Dossier de l'application
+# Définit le dossier de travail
 WORKDIR /var/www/html
 
-# Copie des fichiers
+# Copie tous les fichiers du projet Laravel dans le container
 COPY . .
 
-# Installe les dépendances Laravel
+# Installe les dépendances Laravel (prod uniquement)
 RUN composer install --no-dev --optimize-autoloader
 
-# Droits Laravel
-RUN chown -R www-data:www-data storage bootstrap/cache
+# Donne les bons droits à Laravel (cache + storage)
+RUN chown -R www-data:www-data storage bootstrap/cache public
 
-# Copie la config Apache pour Laravel
+# Copie la configuration Apache pour Laravel
 COPY ./apache/laravel.conf /etc/apache2/sites-available/000-default.conf
 
-# Lancement Apache
+# Spécifie le bon dossier public comme racine Apache
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf
+
+# Lancement d'Apache en mode foreground
 CMD ["apache2-foreground"]
