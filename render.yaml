@@ -1,52 +1,63 @@
 services:
   - type: web
     name: laravel-app
-    env: docker
-    repo: https://github.com/Princeaman007/laravel_roles-permissions
-    branch: master
-    dockerfilePath: ./Dockerfile
+    env: php
     plan: free
+    buildCommand: |
+      composer install --no-dev --optimize-autoloader
+      php artisan config:cache
+      php artisan route:cache
+      php artisan view:cache
+    startCommand: php artisan serve --host 0.0.0.0 --port 10000
+    autoDeploy: true
     envVars:
+      - key: APP_NAME
+        value: E-Commerce
       - key: APP_ENV
         value: production
-      - key: APP_DEBUG
-        value: "false"
-      - key: APP_URL
-        value: https://laravel-app.onrender.com
       - key: APP_KEY
         generateValue: true
+      - key: APP_DEBUG
+        value: false
+      - key: APP_URL
+        value: https://laravel-app.onrender.com
+
+      # Base de données (AlwaysData)
       - key: DB_CONNECTION
         value: mysql
       - key: DB_HOST
-        fromService:
-          type: private
-          name: laravel-mysql
-          property: hostConnectionString # Important : ceci récupère le nom d'hôte interne correct
+        value: mysql-commercelaravel.alwaysdata.net
       - key: DB_PORT
         value: 3306
       - key: DB_DATABASE
-        value: laravel
+        value: commercelaravel_laravel
       - key: DB_USERNAME
-        value: root
+        value: 410513
       - key: DB_PASSWORD
-        value: rootpassword
+        value: Monsecretamoi%%%@@@
+
+      # Session / Cache / Queue
       - key: SESSION_DRIVER
         value: file
       - key: CACHE_STORE
         value: file
       - key: QUEUE_CONNECTION
         value: sync
-    # Je recommande de ne pas utiliser startCommand ici mais plutôt le script start.sh
-    # car il est plus facile à maintenir et à déboguer
 
-  - type: private
-    name: laravel-mysql
-    env: docker
-    dockerfilePath: ""
-    image: mysql:8.0
-    plan: free
-    envVars:
-      - key: MYSQL_DATABASE
-        value: laravel
-      - key: MYSQL_ROOT_PASSWORD
-        value: rootpassword
+      # Mail (si tu envoies des mails)
+      - key: MAIL_MAILER
+        value: smtp
+      - key: MAIL_HOST
+        value: smtp.gmail.com
+      - key: MAIL_PORT
+        value: 587
+      - key: MAIL_USERNAME
+        value: tfeetude@gmail.com
+      - key: MAIL_PASSWORD
+        value: abxeswxxtzebqamp
+      - key: MAIL_ENCRYPTION
+        value: tls
+      - key: MAIL_FROM_ADDRESS
+        value: tfeetude@gmail.com
+      - key: MAIL_FROM_NAME
+        value: E-Commerce
