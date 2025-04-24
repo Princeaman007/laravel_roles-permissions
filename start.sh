@@ -15,12 +15,6 @@ chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 php --version
 echo "PORT: ${PORT:-8080}"
 
-# ⚙️ Configurer Apache pour écouter sur le bon port
-echo "Configuration d'Apache pour le port ${PORT:-8080}"
-sed -i "s/Listen 80/Listen ${PORT:-8080}/g" /etc/apache2/ports.conf
-sed -i "s/:80/:${PORT:-8080}/g" /etc/apache2/sites-available/000-default.conf
-echo "Apache configuré pour le port ${PORT:-8080}"
-
 # 🧪 Debug rapide : montrer les variables de base de données
 echo "Variables d'environnement DB :"
 echo "DB_CONNECTION: $DB_CONNECTION"
@@ -41,6 +35,6 @@ php artisan migrate --force || echo "⚠️ Migration échouée, mais on continu
 # ✅ Créer le lien symbolique pour accéder aux images
 php artisan storage:link || echo "📁 Le lien de stockage existe déjà"
 
-# 🚀 Lancer Apache
-echo "🚀 Lancement du serveur Apache sur le port ${PORT:-8080}"
-apache2-foreground
+# ✅ Lancer le serveur Laravel intégré
+echo "🚀 Lancement du serveur Laravel sur le port ${PORT:-8080}"
+php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
