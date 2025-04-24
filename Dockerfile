@@ -1,4 +1,7 @@
-FROM php:8.2-fpm
+FROM php:8.2-apache
+
+# Active mod_rewrite pour les routes Laravel
+RUN a2enmod rewrite
 
 # Installe les extensions nécessaires
 RUN apt-get update && apt-get install -y \
@@ -8,17 +11,20 @@ RUN apt-get update && apt-get install -y \
 # Installe Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Crée le dossier de l'app
+# Dossier de l'application
 WORKDIR /var/www/html
 
-# Copie tous les fichiers
+# Copie des fichiers
 COPY . .
 
 # Installe les dépendances Laravel
 RUN composer install --no-dev --optimize-autoloader
 
-# Donne les droits à Laravel
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+# Droits Laravel
+RUN chown -R www-data:www-data storage bootstrap/cache
 
-# Le script de démarrage
-CMD ["./start.sh"]
+# Copie la config Apache pour Laravel
+COPY ./apache/laravel.conf /etc/apache2/sites-available/000-default.conf
+
+# Lancement Apache
+CMD ["apache2-foreground"]
