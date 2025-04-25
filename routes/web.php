@@ -116,3 +116,12 @@ Route::get('/debug-logs', function () {
     $latestLogs = mb_substr($contents, -50000); // Récupère les 50000 derniers caractères
     return response($latestLogs)->header('Content-Type', 'text/plain');
 })->middleware('auth'); // Ajoutez une protection si nécessaire
+
+
+Route::get('/debug-csrf', function () {
+    return response()->json([
+        'csrf_token' => csrf_token(),
+        'session_status' => session()->isStarted() ? 'started' : 'not started',
+        'session_id' => session()->getId(),
+    ]);
+});
