@@ -15,14 +15,6 @@ chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 php --version
 echo "PORT: ${PORT:-8080}"
 
-# 🧪 Debug rapide : montrer les variables de base de données
-echo "Variables d'environnement DB :"
-echo "DB_CONNECTION: $DB_CONNECTION"
-echo "DB_HOST: $DB_HOST"
-echo "DB_PORT: $DB_PORT"
-echo "DB_DATABASE: $DB_DATABASE"
-echo "DB_USERNAME: $DB_USERNAME"
-
 # ⚙️ Laravel - configuration & cache
 echo "⚙️ Configuration de Laravel..."
 php artisan config:clear
@@ -35,6 +27,9 @@ php artisan migrate --force || echo "⚠️ Migration échouée, mais on continu
 # ✅ Créer le lien symbolique pour accéder aux images
 php artisan storage:link || echo "📁 Le lien de stockage existe déjà"
 
-# ✅ Lancer le serveur Laravel intégré
-echo "🚀 Lancement du serveur Laravel sur le port ${PORT:-8080}"
-php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
+# Configurer Apache pour écouter sur le port approprié
+sed -i "s/:80/:${PORT:-8080}/g" /etc/apache2/sites-available/000-default.conf
+sed -i "s/80/${PORT:-8080}/g" /etc/apache2/ports.conf
+
+# Lancer Apache en premier plan
+apache2-foreground

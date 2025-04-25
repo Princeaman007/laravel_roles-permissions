@@ -12,9 +12,11 @@ services:
       - key: APP_KEY
         generateValue: true
       - key: APP_DEBUG
-        value: false
+        value: true  # Temporairement à true pour déboguer
       - key: APP_URL
         value: https://laravel-app.onrender.com
+      - key: PORT
+        value: 10000  # Ajout du port pour Render
 
       # Connexion à AlwaysData
       - key: DB_CONNECTION
@@ -28,7 +30,7 @@ services:
       - key: DB_USERNAME
         value: 410513
       - key: DB_PASSWORD
-        value: Monsecretamoi%%%@@@
+        sync: false  # Utiliser une variable sécurisée
 
       # Mail
       - key: MAIL_MAILER
@@ -40,10 +42,12 @@ services:
       - key: MAIL_USERNAME
         value: tfeetude@gmail.com
       - key: MAIL_PASSWORD
-        value: abxeswxxtzebqamp
+        sync: false  # Utiliser une variable sécurisée
       - key: MAIL_ENCRYPTION
         value: tls
       - key: MAIL_FROM_ADDRESS
         value: tfeetude@gmail.com
       - key: MAIL_FROM_NAME
         value: E-Commerce
+    healthCheckPath: /
+    buildCommand: ""  # Laissez vide car tout est dans le Dockerfile
