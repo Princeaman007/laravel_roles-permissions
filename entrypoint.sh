@@ -15,7 +15,16 @@ if [ ! -z "$DB_HOST" ]; then
   sed -i "s|DB_PASSWORD=.*|DB_PASSWORD=$DB_PASSWORD|g" .env
 fi
 
-# D'autres variables d'environnement peuvent être ajoutées de la même façon
+# Configurer correctement Apache pour utiliser le port de Render
+if [ ! -z "$PORT" ]; then
+  echo "Configuring Apache to use PORT: $PORT"
+  
+  # Configuration du port dans 000-default.conf (modifier VirtualHost)
+  sed -i "s/<VirtualHost \*:80>/<VirtualHost *:$PORT>/g" /etc/apache2/sites-available/000-default.conf
+  
+  # Configuration dans ports.conf (correct syntax)
+  sed -i "s/Listen 80/Listen $PORT/g" /etc/apache2/ports.conf
+fi
 
 # Effacer les caches précédents
 php artisan config:clear
@@ -26,7 +35,7 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# Migrations (optionnel, à désactiver si vous ne voulez pas les exécuter à chaque démarrage)
+# Migrations (optionnel)
 php artisan migrate --force || echo "Migration failed, but continuing..."
 
 # Créer le lien symbolique pour le stockage

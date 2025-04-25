@@ -23,9 +23,6 @@ COPY .env.example .env
 # Installe les dépendances Laravel (prod uniquement)
 RUN composer install --no-dev --optimize-autoloader
 
-# Ne pas générer de clé ici, Render s'en chargera
-# SUPPRIMÉ: RUN php artisan key:generate --force
-
 # Donne les bons droits à Laravel (cache + storage)
 RUN mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache
 RUN chown -R www-data:www-data /var/www/html
@@ -38,10 +35,11 @@ RUN chmod +x /entrypoint.sh
 # Copie la configuration Apache pour Laravel
 COPY ./apache/laravel.conf /etc/apache2/sites-available/000-default.conf
 
-# Pour supporter le port dynamique de Render
-ENV PORT=10000
-RUN sed -i "s/80/:${PORT}/g" /etc/apache2/sites-available/000-default.conf
-RUN sed -i "s/80/:${PORT}/g" /etc/apache2/ports.conf
+# NE PAS modifier ports.conf dans le Dockerfile
+# Les lignes problématiques sont supprimées:
+# ENV PORT=10000
+# RUN sed -i "s/80/:${PORT}/g" /etc/apache2/sites-available/000-default.conf
+# RUN sed -i "s/80/:${PORT}/g" /etc/apache2/ports.conf
 
 # Utiliser un script d'entrée plutôt que de lancer directement Apache
 ENTRYPOINT ["/entrypoint.sh"]
