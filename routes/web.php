@@ -108,3 +108,11 @@ Route::get('orders/{order}/invoice', [App\Http\Controllers\OrderController::clas
 Route::get('/contact', [ContactController::class, 'showForm'])->name('contact.form');
  
 Route::post('/contact', [ContactController::class, 'sendMail'])->name('contact.send');
+
+
+Route::get('/debug-logs', function () {
+    $logPath = storage_path('logs/laravel.log');
+    $contents = file_exists($logPath) ? file_get_contents($logPath) : "Aucun fichier log trouvé";
+    $latestLogs = mb_substr($contents, -50000); // Récupère les 50000 derniers caractères
+    return response($latestLogs)->header('Content-Type', 'text/plain');
+})->middleware('auth'); // Ajoutez une protection si nécessaire
