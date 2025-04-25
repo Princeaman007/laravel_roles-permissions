@@ -10,13 +10,23 @@ services:
       - key: APP_ENV
         value: production
       - key: APP_KEY
-        generateValue: true
+        value: base64:++TZu2gAYCwQBemYafUuvf2cg+jDf2nC2ECJSNBk6WY=
       - key: APP_DEBUG
         value: true  # Temporairement à true pour déboguer
       - key: APP_URL
         value: https://laravel-app.onrender.com
       - key: PORT
         value: 10000  # Ajout du port pour Render
+
+      # Configuration du cache et des sessions
+      - key: CACHE_DRIVER
+        value: file
+      - key: SESSION_DRIVER
+        value: cookie
+      - key: SESSION_SECURE_COOKIE
+        value: true
+      - key: SESSION_SAME_SITE
+        value: none
 
       # Connexion à AlwaysData
       - key: DB_CONNECTION
@@ -50,4 +60,4 @@ services:
       - key: MAIL_FROM_NAME
         value: E-Commerce
     healthCheckPath: /
-    buildCommand: ""  # Laissez vide car tout est dans le Dockerfile
+    buildCommand: "chmod -R 775 storage bootstrap/cache"  # Ajout des permissions

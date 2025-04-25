@@ -125,3 +125,13 @@ Route::get('/debug-csrf', function () {
         'session_id' => session()->getId(),
     ]);
 });
+
+// Exempter cette route de la vérification CSRF
+Route::post('/test-login', function (Illuminate\Http\Request $request) {
+    $credentials = $request->only('email', 'password');
+    if (Auth::attempt($credentials)) {
+        return redirect()->intended('/dashboard');
+    }
+    return back()->withErrors(['email' => 'Identifiants incorrects']);
+})->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
+
