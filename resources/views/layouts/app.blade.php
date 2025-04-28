@@ -1,3 +1,4 @@
+```html
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -15,11 +16,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- CSS Personnalisé (remplace Vite) -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <!-- Styles et Scripts via Vite -->
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 <body>
 <div id="app">
@@ -208,9 +206,6 @@
     </footer>
 </div>
 
-<!-- Bootstrap 5 JS Bundle (inclut Popper.js) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 <!-- Script d'initialisation des dropdowns -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -257,8 +252,6 @@
     });
 </script>
 
-<!-- JavaScript de l'application (remplace Vite) -->
-<script src="{{ asset('js/app.js') }}"></script>
-
 </body>
 </html>
+```
